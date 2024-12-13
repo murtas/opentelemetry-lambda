@@ -152,3 +152,37 @@ When used with the batch processor the decouple processor must be the last proce
 is successfully exported before the lambda environment is frozen.
 
 As stated previously in the auto-configuration section, the OpenTelemetry Lambda Layer will automatically add the decouple processor to the end of the processors if the batch is used and the decouple processor is not. The result will be the same whether you configure it manually or not.
+
+## Example config
+
+### Logz
+
+```yml
+# https://opentelemetry.io/docs/collector/configuration/
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 5s
+
+exporters:
+  logzio/traces:
+    account_token: "<TOKEN>"
+    region: "eu"
+    headers:
+      user-agent: logzio-opentelemetry-traces
+  debug:
+    verbosity: detailed
+
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logzio/traces,debug]
+```

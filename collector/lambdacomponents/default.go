@@ -17,82 +17,84 @@
 package lambdacomponents
 
 import (
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/sigv4authextension"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor"
-	"github.com/open-telemetry/opentelemetry-lambda/collector/processor/decoupleprocessor"
-	"go.opentelemetry.io/collector/exporter"
-	"go.opentelemetry.io/collector/exporter/debugexporter"
-	"go.opentelemetry.io/collector/exporter/otlpexporter"
-	"go.opentelemetry.io/collector/exporter/otlphttpexporter"
-	"go.opentelemetry.io/collector/extension"
-	"go.opentelemetry.io/collector/otelcol"
-	"go.opentelemetry.io/collector/processor"
-	"go.opentelemetry.io/collector/processor/batchprocessor"
-	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
-	"go.opentelemetry.io/collector/receiver"
-	"go.opentelemetry.io/collector/receiver/otlpreceiver"
-	"go.uber.org/multierr"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/logzioexporter"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/extension/sigv4authextension"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor"
+    "github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor"
+    "github.com/open-telemetry/opentelemetry-lambda/collector/processor/decoupleprocessor"
+    "go.opentelemetry.io/collector/exporter"
+    "go.opentelemetry.io/collector/exporter/debugexporter"
+    "go.opentelemetry.io/collector/exporter/otlpexporter"
+    "go.opentelemetry.io/collector/exporter/otlphttpexporter"
+    "go.opentelemetry.io/collector/extension"
+    "go.opentelemetry.io/collector/otelcol"
+    "go.opentelemetry.io/collector/processor"
+    "go.opentelemetry.io/collector/processor/batchprocessor"
+    "go.opentelemetry.io/collector/processor/memorylimiterprocessor"
+    "go.opentelemetry.io/collector/receiver"
+    "go.opentelemetry.io/collector/receiver/otlpreceiver"
+    "go.uber.org/multierr"
 
-	"github.com/open-telemetry/opentelemetry-lambda/collector/processor/coldstartprocessor"
-	"github.com/open-telemetry/opentelemetry-lambda/collector/receiver/telemetryapireceiver"
+    "github.com/open-telemetry/opentelemetry-lambda/collector/processor/coldstartprocessor"
+    "github.com/open-telemetry/opentelemetry-lambda/collector/receiver/telemetryapireceiver"
 )
 
 func Components(extensionID string) (otelcol.Factories, error) {
-	var errs []error
+    var errs []error
 
-	receivers, err := receiver.MakeFactoryMap(
-		otlpreceiver.NewFactory(),
-		telemetryapireceiver.NewFactory(extensionID),
-	)
-	if err != nil {
-		errs = append(errs, err)
-	}
+    receivers, err := receiver.MakeFactoryMap(
+        otlpreceiver.NewFactory(),
+        telemetryapireceiver.NewFactory(extensionID),
+    )
+    if err != nil {
+        errs = append(errs, err)
+    }
 
-	exporters, err := exporter.MakeFactoryMap(
-		debugexporter.NewFactory(),
-		otlpexporter.NewFactory(),
-		otlphttpexporter.NewFactory(),
-		prometheusremotewriteexporter.NewFactory(),
-	)
-	if err != nil {
-		errs = append(errs, err)
-	}
+    exporters, err := exporter.MakeFactoryMap(
+        debugexporter.NewFactory(),
+        otlpexporter.NewFactory(),
+        otlphttpexporter.NewFactory(),
+        prometheusremotewriteexporter.NewFactory(),
+        logzioexporter.NewFactory(),
+    )
+    if err != nil {
+        errs = append(errs, err)
+    }
 
-	processors, err := processor.MakeFactoryMap(
-		attributesprocessor.NewFactory(),
-		filterprocessor.NewFactory(),
-		memorylimiterprocessor.NewFactory(),
-		probabilisticsamplerprocessor.NewFactory(),
-		resourceprocessor.NewFactory(),
-		spanprocessor.NewFactory(),
-		coldstartprocessor.NewFactory(),
-		decoupleprocessor.NewFactory(),
-		batchprocessor.NewFactory(),
-	)
-	if err != nil {
-		errs = append(errs, err)
-	}
+    processors, err := processor.MakeFactoryMap(
+        attributesprocessor.NewFactory(),
+        filterprocessor.NewFactory(),
+        memorylimiterprocessor.NewFactory(),
+        probabilisticsamplerprocessor.NewFactory(),
+        resourceprocessor.NewFactory(),
+        spanprocessor.NewFactory(),
+        coldstartprocessor.NewFactory(),
+        decoupleprocessor.NewFactory(),
+        batchprocessor.NewFactory(),
+    )
+    if err != nil {
+        errs = append(errs, err)
+    }
 
-	extensions, err := extension.MakeFactoryMap(
-		sigv4authextension.NewFactory(),
-		basicauthextension.NewFactory(),
-	)
-	if err != nil {
-		errs = append(errs, err)
-	}
+    extensions, err := extension.MakeFactoryMap(
+        sigv4authextension.NewFactory(),
+        basicauthextension.NewFactory(),
+    )
+    if err != nil {
+        errs = append(errs, err)
+    }
 
-	factories := otelcol.Factories{
-		Receivers:  receivers,
-		Exporters:  exporters,
-		Processors: processors,
-		Extensions: extensions,
-	}
+    factories := otelcol.Factories{
+        Receivers:  receivers,
+        Exporters:  exporters,
+        Processors: processors,
+        Extensions: extensions,
+    }
 
-	return factories, multierr.Combine(errs...)
+    return factories, multierr.Combine(errs...)
 }
